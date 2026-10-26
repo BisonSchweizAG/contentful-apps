@@ -64,5 +64,6 @@ jobs:
         if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || (github.event_name == 'workflow_dispatch' && inputs.deploy == true)
         env:
           DEFINITIONS_ORG_ID: ${{ secrets.DEFINITIONS_ORG_ID }}
+          DEEP_CLONE_APP_DEFINITION_ID: ${{ secrets.DEEP_CLONE_APP_DEFINITION_ID }}
           CONTENTFUL_CMA_TOKEN: ${{ secrets.CONTENTFUL_CMA_TOKEN }}
         run: npm run deploy
