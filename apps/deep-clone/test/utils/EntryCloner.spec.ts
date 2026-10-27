@@ -856,6 +856,33 @@ describe('EntryCloner', () => {
       ]);
     });
 
+    it('does not return blacklisted referenced entries as clone candidates', async () => {
+      const blacklistedReferencedEntry = getMockEntry('blacklisted-entry-id', {
+        title: { 'en-US': 'Global Header Title' },
+      });
+      blacklistedReferencedEntry.sys.contentType.sys.id = 'globalHeader';
+
+      const mainEntryWithBlacklistedReference = getMockEntry('main-entry-id', {
+        title: { 'en-US': 'Main Entry Title' },
+        reference: {
+          'en-US': {
+            sys: { type: 'Link', linkType: 'Entry', id: 'blacklisted-entry-id' },
+          },
+        },
+      });
+
+      mockCma.contentType.get.mockResolvedValue(contentType);
+      mockCma.entry.get
+        .mockResolvedValueOnce(mainEntryWithBlacklistedReference)
+        .mockResolvedValueOnce(blacklistedReferencedEntry);
+
+      const entries = await entryCloner.getReferenceEntries();
+
+      expect(entries).toHaveLength(1);
+      expect(entries[0].entryId).toBe('main-entry-id');
+      expect(entries.map((entry) => entry.entryId)).not.toContain('blacklisted-entry-id');
+    });
+
     it('returns entries in discovery order with depth and fan-in counts', async () => {
       const link = (id: string) => ({ sys: { type: 'Link', linkType: 'Entry', id } });
       const entries: Record<string, ReturnType<typeof getMockEntry>> = {

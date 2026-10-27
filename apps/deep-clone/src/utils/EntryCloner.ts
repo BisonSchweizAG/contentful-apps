@@ -143,8 +143,9 @@ class EntryCloner {
     signal?: AbortSignal
   ): Promise<void> {
     this.throwIfDiscoveryAborted(signal);
+    this.addChildReference(parentEntryId, entryId);
+
     if (this.references[entryId]) {
-      this.addChildReference(parentEntryId, entryId);
       return;
     }
 
@@ -162,7 +163,6 @@ class EntryCloner {
         return;
       }
 
-      this.addChildReference(parentEntryId, entryId);
       this.references[entryId] = entry;
       this.discoveryOrder.push(entryId);
       this.discoveryParents[entryId] = parentEntryId ?? null;
